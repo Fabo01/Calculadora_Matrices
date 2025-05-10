@@ -1,0 +1,515 @@
+% ... Portada ...
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{enumitem}
+
+\begin{document}
+
+% Portada
+\begin{titlepage}
+    \centering
+    {\scshape\LARGE Universidad Cátolica de Temuco \par}
+    {\scshape\Large Ingeniería Civil en Informática \par}
+    {\scshape\Large MAT1187 - Álgebra Lineal para la Computación \par}
+    \vspace{2cm}
+    {\Huge\bfseries Proyecto Aplicado N°1 \par}
+    \vspace{1cm}
+    {\Large\bfseries Métodos de Gauss, Gauss-Jordan y Factorización LU \par}
+    \vspace{2cm}
+    \begin{flushleft}
+        \textbf{Integrantes:} Esban Vejar Chávez, Gonzalo Pesenti Araneda, Daniela Romero Coliñir y Fabián García Valdebenito \\ 
+        \textbf{Profesor:} Nixon Molina Vásquez \\ 
+        \textbf{Fecha:} 6 de mayo de 2025
+    \end{flushleft}
+    \vfill
+\end{titlepage}
+
+% Índice
+\tableofcontents
+\newpage
+
+% Introducción
+\section{Introducción}
+La resolución de sistemas de ecuaciones lineales constituye una de las problemáticas más recurrentes y fundamentales en la ingeniería, las ciencias exactas y la computación. Estos sistemas permiten modelar fenómenos físicos, optimizar recursos, analizar estructuras y resolver problemas complejos en diversas áreas del conocimiento. El álgebra de matrices, como rama del álgebra lineal, proporciona un marco teórico y práctico para abordar estos sistemas de manera eficiente y estructurada.
+
+En la actualidad, el desarrollo de métodos numéricos ha permitido resolver sistemas de gran tamaño y complejidad, que serían inviables de abordar mediante técnicas manuales. Entre los métodos más relevantes y utilizados se encuentran la Eliminación Gaussiana, el método de Gauss-Jordan y la Factorización LU. Cada uno de estos algoritmos presenta características particulares, ventajas y limitaciones, que los hacen más o menos adecuados según el contexto y el tipo de problema a resolver.
+
+El presente informe tiene como objetivo analizar en profundidad estos tres métodos, abordando su fundamento teórico, procedimiento, ventajas, desventajas y aplicaciones prácticas. Además, se busca establecer una comparación entre ellos, que permita seleccionar la técnica más adecuada para cada situación. Este análisis servirá como base para el desarrollo de una calculadora de matrices, herramienta que facilitará la resolución automatizada de sistemas lineales en futuras fases del proyecto. Asimismo, se explica la historia de estos métodos para comprender su evolución y relevancia en el contexto actual.
+
+% Resumen
+\section{Resumen}
+El presente informe aborda el estudio y comparación de tres métodos fundamentales para la resolución de sistemas de ecuaciones lineales: la Eliminación Gaussiana, el método de Gauss-Jordan y la Factorización LU. Se expone el contexto histórico de cada técnica, su fundamento teórico, los procedimientos detallados para su aplicación, así como sus ventajas, desventajas y principales aplicaciones en la ingeniería y la computación.
+
+A través de una revisión exhaustiva de la literatura y los documentos de referencia, se presentan ejemplos numéricos y análisis comparativos que permiten comprender la utilidad y limitaciones de cada método. El informe busca proporcionar una base sólida para la selección adecuada de la técnica más eficiente según el tipo de problema, sirviendo además como sustento teórico para el desarrollo de una calculadora de matrices en fases posteriores del proyecto.
+
+% Marco Teórico
+\section{Marco Teórico}
+El álgebra lineal es una rama fundamental de las matemáticas que estudia las estructuras algebraicas conocidas como espacios vectoriales, así como las transformaciones lineales entre ellos. Dentro de este campo, las matrices y los sistemas de ecuaciones lineales ocupan un lugar central, ya que permiten modelar y resolver una amplia variedad de problemas en ingeniería, física, economía, informática y otras disciplinas.
+
+Un sistema de ecuaciones lineales es un conjunto de ecuaciones en las que las incógnitas aparecen solo con exponentes uno y no se multiplican entre sí. Estos sistemas pueden representarse de manera compacta mediante matrices, lo que facilita su manipulación y resolución utilizando métodos algebraicos y numéricos.
+
+La representación matricial de un sistema de ecuaciones lineales permite expresar el sistema en la forma general $AX = B$, donde $A$ es la matriz de coeficientes, $X$ es el vector de incógnitas y $B$ es el vector de términos independientes. Esta notación es especialmente útil para el desarrollo de algoritmos computacionales y la aplicación de métodos numéricos.
+
+La importancia de los sistemas de ecuaciones lineales radica en su capacidad para describir fenómenos y relaciones en múltiples áreas del conocimiento. Por ejemplo, en ingeniería se utilizan para analizar circuitos eléctricos, estructuras mecánicas y flujos de fluidos; en economía, para modelar sistemas de producción y consumo; y en informática, para resolver problemas de gráficos computacionales y aprendizaje automático.
+
+El desarrollo de métodos numéricos eficientes para la resolución de sistemas lineales ha sido clave en el avance de la ciencia y la tecnología. Entre los métodos más utilizados se encuentran la Eliminación Gaussiana, el método de Gauss-Jordan y la Factorización LU, los cuales serán analizados en detalle en las siguientes secciones.
+
+\subsection{Sistemas de Ecuaciones Lineales}
+Un sistema de ecuaciones lineales es un conjunto de ecuaciones de la forma:
+\begin{equation*}
+\begin{cases}
+a_{11}x_1 + a_{12}x_2 + \dots + a_{1n}x_n = b_1 \\
+a_{21}x_1 + a_{22}x_2 + \dots + a_{2n}x_n = b_2 \\
+\vdots \\
+a_{m1}x_1 + a_{m2}x_2 + \dots + a_{mn}x_n = b_m \\
+\end{cases}
+\end{equation*}
+
+\subsection{Representación Matricial}
+Se puede expresar como $AX = B$, donde:
+\begin{itemize}
+    \item $A$ es la matriz de coeficientes ($m \times n$),
+    \item $X$ es el vector de incógnitas,
+    \item $B$ es el vector de términos independientes.
+\end{itemize}
+
+% Desarrollo
+\section{Desarrollo}
+\subsection{Eliminación Gaussiana}
+
+\textbf{Historia:}  \\
+La Eliminación Gaussiana es un método atribuido a Carl Friedrich Gauss, aunque sus orígenes se remontan a la antigua China, donde ya se utilizaban técnicas similares en el texto matemático “El arte del cómputo” (Jiuzhang Suanshu). Gauss formalizó y popularizó el método en el siglo XIX, convirtiéndolo en una herramienta fundamental del álgebra lineal.
+
+\textbf{Fundamento teórico:}  \\
+El método consiste en transformar un sistema de ecuaciones lineales en otro equivalente, pero más sencillo de resolver, mediante operaciones elementales sobre las filas de la matriz aumentada. El objetivo es obtener una matriz triangular superior, lo que permite resolver el sistema por sustitución regresiva.
+
+\textbf{Procedimiento:}
+\begin{enumerate}
+    \item Formar la matriz aumentada $[A|B]$ del sistema.
+    \item Utilizar operaciones elementales por filas para anular los coeficientes por debajo de la diagonal principal, obteniendo una matriz triangular superior.
+    \item Resolver el sistema resultante por sustitución regresiva, comenzando por la última ecuación.
+\end{enumerate}
+
+\textbf{Ejemplo numérico:}  \\
+Resolver el siguiente sistema usando Eliminación Gaussiana:
+\[
+\begin{cases}
+x + y + z = 6 \\
+x + 2y + z = 7 \\
+2x + y + z = 8 \\
+\end{cases}
+\]
+
+\textit{Paso 1: Matriz aumentada}
+\[
+\left[
+\begin{array}{ccc|c}
+1 & 1 & 1 & 6 \\
+1 & 2 & 1 & 7 \\
+2 & 1 & 1 & 8 \\
+\end{array}
+\right]
+\]
+
+\textit{Paso 2: Anulación de coeficientes debajo de la diagonal}
+\begin{itemize}
+    \item Fila 2: $F_2 - F_1 \rightarrow F_2$  \\
+    $[1, 2, 1, 7] - [1, 1, 1, 6] = [0, 1, 0, 1]$
+    \item Fila 3: $F_3 - 2F_1 \rightarrow F_3$  \\
+    $[2, 1, 1, 8] - 2 \times [1, 1, 1, 6] = [0, -1, -1, -4]$
+\end{itemize}
+
+\[
+\left[
+\begin{array}{ccc|c}
+1 & 1 & 1 & 6 \\
+0 & 1 & 0 & 1 \\
+0 & -1 & -1 & -4 \\
+\end{array}
+\right]
+\]
+
+\textit{Paso 3: Anulación en la tercera fila}
+\begin{itemize}
+    \item Fila 3: $F_3 + F_2 \rightarrow F_3$  \\
+    $[0, -1, -1, -4] + [0, 1, 0, 1] = [0, 0, -1, -3]$
+\end{itemize}
+
+\[
+\left[
+\begin{array}{ccc|c}
+1 & 1 & 1 & 6 \\
+0 & 1 & 0 & 1 \\
+0 & 0 & -1 & -3 \\
+\end{array}
+\right]
+\]
+
+\textit{Paso 4: Sustitución regresiva}
+\begin{align*}
+z &= 3 \\
+y + 0z &= 1 \implies y = 1 \\
+x + y + z = 6 \implies x + 1 + 3 = 6 \implies x = 2 \\
+\end{align*}
+
+\textbf{Solución:}  \\
+$x = 2$, $y = 1$, $z = 3$
+
+\textbf{Ventajas:}
+\begin{itemize}
+    \item Método sistemático y aplicable a cualquier sistema compatible determinado.
+    \item Base para otros métodos más avanzados.
+\end{itemize}
+
+\textbf{Desventajas:}
+\begin{itemize}
+    \item Puede ser inestable numéricamente si no se usa pivotaje.
+    \item No es eficiente para resolver varios sistemas con la misma matriz de coeficientes.
+\end{itemize}
+
+\textbf{Aplicaciones:}
+\begin{itemize}
+    \item Resolución de sistemas en ingeniería estructural, circuitos eléctricos, análisis de redes, entre otros.
+\end{itemize}
+
+\subsection{Método de Gauss-Jordan}
+
+\textbf{Historia:}  \\
+El método de Gauss-Jordan fue propuesto por Wilhelm Jordan en el siglo XIX como una extensión y mejora del método de Gauss. Su desarrollo permitió simplificar aún más la resolución de sistemas lineales y el cálculo de la inversa de matrices, siendo ampliamente adoptado en la enseñanza y en aplicaciones computacionales.
+
+\textbf{Fundamento teórico:}  \\
+El método de Gauss-Jordan consiste en transformar la matriz aumentada del sistema en su forma reducida por filas, es decir, en una matriz donde la parte de los coeficientes es la matriz identidad. Esto se logra mediante operaciones elementales por filas, permitiendo obtener la solución del sistema de manera directa, sin necesidad de sustitución regresiva.
+
+\textbf{Procedimiento:}
+\begin{enumerate}
+    \item Formar la matriz aumentada $[A|B]$ del sistema.
+    \item Aplicar operaciones elementales por filas para obtener ceros en todos los elementos de cada columna, excepto en el pivote, que debe ser 1.
+    \item La matriz resultante tendrá la identidad en la parte de los coeficientes y la solución en la columna ampliada.
+\end{enumerate}
+
+\textbf{Ejemplo numérico:}  \\
+Resolver el siguiente sistema usando el método de Gauss-Jordan:
+\[
+\begin{cases}
+x + y + z = 6 \\
+x + 2y + z = 7 \\
+2x + y + z = 8 \\
+\end{cases}
+\]
+
+\textit{Paso 1: Matriz aumentada}
+\[
+\left[
+\begin{array}{ccc|c}
+1 & 1 & 1 & 6 \\
+1 & 2 & 1 & 7 \\
+2 & 1 & 1 & 8 \\
+\end{array}
+\right]
+\]
+
+\textit{Paso 2: Llevar el primer pivote a 1 (ya es 1)}
+
+\textit{Paso 3: Anular los elementos debajo del primer pivote}
+\begin{itemize}
+    \item Fila 2: $F_2 - F_1 \rightarrow F_2$ \\
+    $[1, 2, 1, 7] - [1, 1, 1, 6] = [0, 1, 0, 1]$
+    \item Fila 3: $F_3 - 2F_1 \rightarrow F_3$ \\
+    $[2, 1, 1, 8] - 2 \times [1, 1, 1, 6] = [0, -1, -1, -4]$
+\end{itemize}
+
+\[
+\left[
+\begin{array}{ccc|c}
+1 & 1 & 1 & 6 \\
+0 & 1 & 0 & 1 \\
+0 & -1 & -1 & -4 \\
+\end{array}
+\right]
+\]
+
+\textit{Paso 4: Llevar el segundo pivote a 1 (ya es 1)}
+
+\textit{Paso 5: Anular los elementos encima y debajo del segundo pivote}
+\begin{itemize}
+    \item Fila 1: $F_1 - F_2 \rightarrow F_1$ \\
+    $[1, 1, 1, 6] - [0, 1, 0, 1] = [1, 0, 1, 5]$
+    \item Fila 3: $F_3 + F_2 \rightarrow F_3$ \\
+    $[0, -1, -1, -4] + [0, 1, 0, 1] = [0, 0, -1, -3]$
+\end{itemize}
+
+\[
+\left[
+\begin{array}{ccc|c}
+1 & 0 & 1 & 5 \\
+0 & 1 & 0 & 1 \\
+0 & 0 & -1 & -3 \\
+\end{array}
+\right]
+\]
+
+\textit{Paso 6: Llevar el tercer pivote a 1 (multiplicar F3 por -1)}
+\[
+\left[
+\begin{array}{ccc|c}
+1 & 0 & 1 & 5 \\
+0 & 1 & 0 & 1 \\
+0 & 0 & 1 & 3 \\
+\end{array}
+\right]
+\]
+
+\textit{Paso 7: Anular los elementos encima del tercer pivote}
+\begin{itemize}
+    \item Fila 1: $F_1 - F_3 \rightarrow F_1$ \\
+    $[1, 0, 1, 5] - [0, 0, 1, 3] = [1, 0, 0, 2]$
+\end{itemize}
+
+\[
+\left[
+\begin{array}{ccc|c}
+1 & 0 & 0 & 2 \\
+0 & 1 & 0 & 1 \\
+0 & 0 & 1 & 3 \\
+\end{array}
+\right]
+\]
+
+\textbf{Solución:}  \\
+$x = 2$, $y = 1$, $z = 3$
+
+\textbf{Ventajas:}
+\begin{itemize}
+    \item Permite obtener la solución directamente, sin sustitución regresiva.
+    \item Facilita el cálculo de la inversa de una matriz.
+    \item Útil para analizar la dependencia lineal entre ecuaciones.
+\end{itemize}
+
+\textbf{Desventajas:}
+\begin{itemize}
+    \item Requiere mayor número de operaciones que la Eliminación Gaussiana.
+    \item Menos eficiente para sistemas grandes.
+\end{itemize}
+
+\textbf{Aplicaciones:}
+\begin{itemize}
+    \item Resolución directa de sistemas lineales pequeños o medianos.
+    \item Cálculo de la inversa de matrices.
+    \item Análisis de sistemas dependientes o indeterminados.
+\end{itemize}
+
+\subsection{Factorización LU}
+
+\textbf{Historia:}  \\
+La factorización LU fue formalizada en el siglo XX, aunque sus bases se remontan a los trabajos de Gauss. El método se popularizó con el auge de la computación, ya que permite resolver eficientemente múltiples sistemas lineales con la misma matriz de coeficientes. Es fundamental en álgebra lineal numérica y ampliamente utilizado en software científico.
+
+\textbf{Fundamento teórico:}  \\
+La factorización LU consiste en descomponer una matriz cuadrada $A$ en el producto de una matriz triangular inferior $L$ y una matriz triangular superior $U$, es decir, $A = LU$. Esto permite resolver sistemas $AX = B$ en dos etapas: primero resolviendo $LY = B$ (sustitución progresiva) y luego $UX = Y$ (sustitución regresiva).
+
+\textbf{Procedimiento:}
+\begin{enumerate}
+    \item Factorizar la matriz $A$ en $L$ y $U$.
+    \item Resolver el sistema $LY = B$.
+    \item Resolver el sistema $UX = Y$.
+\end{enumerate}
+
+\textbf{Ejemplo numérico:}  \\
+Resolver el siguiente sistema usando factorización LU:
+\[
+\begin{cases}
+2x + y + z = 7 \\
+x + 2y + z = 7 \\
+x + y + 2z = 8 \\
+\end{cases}
+\]
+
+\textit{Paso 1: Factorización de $A$ en $L$ y $U$}
+
+Sea $A = 
+\begin{bmatrix}
+2 & 1 & 1 \\
+1 & 2 & 1 \\
+1 & 1 & 2 \\
+\end{bmatrix}$
+
+Buscamos $L$ y $U$ tales que $A = LU$:
+
+$L = 
+\begin{bmatrix}
+1 & 0 & 0 \\
+l_{21} & 1 & 0 \\
+l_{31} & l_{32} & 1 \\
+\end{bmatrix}$,
+$U = 
+\begin{bmatrix}
+u_{11} & u_{12} & u_{13} \\
+0 & u_{22} & u_{23} \\
+0 & 0 & u_{33} \\
+\end{bmatrix}$
+
+Por el método de Doolittle:
+
+$u_{11} = 2$\\
+$u_{12} = 1$\\
+$u_{13} = 1$\\
+$l_{21} = 1/2 = 0.5$\\
+$l_{31} = 1/2 = 0.5$\\
+$u_{22} = 2 - 0.5 \times 1 = 1.5$\\
+$u_{23} = 1 - 0.5 \times 1 = 0.5$\\
+$l_{32} = (1 - 0.5 \times 1)/1.5 = (1 - 0.5)/1.5 = 0.5/1.5 = 1/3$\\
+$u_{33} = 2 - 0.5 \times 1 - (1/3) \times 0.5 = 2 - 0.5 - 1/6 = 1.5 - 1/6 = 4/3$
+
+Por lo tanto,
+
+$L = 
+\begin{bmatrix}
+1 & 0 & 0 \\
+0.5 & 1 & 0 \\
+0.5 & 1/3 & 1 \\
+\end{bmatrix}$,
+$U = 
+\begin{bmatrix}
+2 & 1 & 1 \\
+0 & 1.5 & 0.5 \\
+0 & 0 & 4/3 \\
+\end{bmatrix}$
+
+\textit{Paso 2: Resolver $LY = B$}
+
+\[
+\begin{bmatrix}
+1 & 0 & 0 \\
+0.5 & 1 & 0 \\
+0.5 & 1/3 & 1 \\
+\end{bmatrix}
+\begin{bmatrix}
+y_1 \\ y_2 \\ y_3
+\end{bmatrix}
+=
+\begin{bmatrix}
+7 \\ 7 \\ 8
+\end{bmatrix}
+\]
+
+\begin{align*}
+y_1 &= 7 \\
+0.5y_1 + y_2 &= 7 \\
+y_2 &= 7 - 0.5 \times 7 = 3.5 \\
+0.5y_1 + (1/3)y_2 + y_3 &= 8 \\
+0.5 \times 7 + (1/3) \times 3.5 + y_3 &= 8 \\
+3.5 + 7/6 + y_3 &= 8 \\
+y_3 &= 8 - 3.5 - 7/6 \\
+y_3 &= 4.5 - 7/6 \\
+y_3 &= 20/6 = 10/3
+\end{align*}
+
+\textit{Paso 3: Resolver $UX = Y$}
+
+\[
+\begin{bmatrix}
+2 & 1 & 1 \\
+0 & 1.5 & 0.5 \\
+0 & 0 & 4/3 \\
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\ x_2 \\ x_3
+\end{bmatrix}
+=
+\begin{bmatrix}
+7 \\ 3.5 \\ 10/3
+\end{bmatrix}
+\]
+
+\begin{align*}
+\frac{4}{3}x_3 &= \frac{10}{3} \\
+x_3 &= 2 \\
+1.5x_2 + 0.5x_3 &= 3.5 \\
+1.5x_2 + 1 &= 3.5 \\
+1.5x_2 &= 2.5 \\
+x_2 &= \frac{5}{3} \\
+2x_1 + x_2 + x_3 &= 7 \\
+2x_1 + \frac{5}{3} + 2 &= 7 \\
+2x_1 &= 7 - \frac{5}{3} - 2 \\
+2x_1 &= \frac{21 - 5 - 6}{3} = \frac{10}{3} \\
+x_1 &= \frac{5}{3}
+\end{align*}
+
+\textbf{Solución:}  \\
+$x = 5/3$, $y = 5/3$, $z = 2$
+
+\textbf{Ventajas:}
+\begin{itemize}
+    \item Muy eficiente para resolver varios sistemas con la misma matriz $A$ y diferentes vectores $B$.
+    \item Base de muchos algoritmos numéricos modernos.
+\end{itemize}
+
+\textbf{Desventajas:}
+\begin{itemize}
+    \item Requiere que la matriz sea cuadrada y no singular.
+    \item Puede requerir pivotaje para estabilidad.
+\end{itemize}
+
+\textbf{Aplicaciones:}
+\begin{itemize}
+    \item Resolución eficiente de sistemas lineales en simulaciones y análisis numérico.
+    \item Cálculo de inversas y determinantes de matrices.
+    \item Métodos iterativos y algoritmos de optimización.
+\end{itemize}
+
+% Comparación de Métodos
+\section{Comparación de Métodos}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|p{3cm}|p{3cm}|p{3cm}|}
+\hline
+\textbf{Método} & \textbf{Ventajas} & \textbf{Desventajas} & \textbf{Aplicaciones} \\
+\hline
+Eliminación Gaussiana & Sistemático, base para otros métodos, aplicable a cualquier sistema compatible determinado & Puede ser inestable sin pivotaje, no eficiente para varios sistemas con la misma matriz & Ingeniería estructural, circuitos eléctricos, análisis de redes \\
+\hline
+Gauss-Jordan & Solución directa, facilita el cálculo de la inversa, útil para analizar dependencia lineal & Mayor número de operaciones, menos eficiente para sistemas grandes & Sistemas pequeños o medianos, cálculo de inversa, análisis de sistemas dependientes \\
+\hline
+Factorización LU & Eficiente para múltiples sistemas con la misma matriz, ampliamente usado en software científico & Requiere factorización previa, solo para matrices cuadradas & Resolución de varios sistemas, álgebra lineal numérica, software científico \\
+\hline
+\end{tabular}
+\caption{Comparación de métodos para la resolución de sistemas de ecuaciones lineales}
+\end{table}
+
+% Conclusión
+\section{Conclusión}
+
+En este informe se han analizado y comparado los principales métodos para la resolución de sistemas de ecuaciones lineales: Eliminación Gaussiana, Gauss-Jordan y Factorización LU. Cada uno de estos métodos presenta ventajas y desventajas particulares, lo que determina su aplicabilidad según el tipo de problema y los recursos disponibles.
+
+La Eliminación Gaussiana destaca por su sistematicidad y su uso como base para otros algoritmos, aunque puede presentar problemas de estabilidad numérica en ausencia de pivotaje. El método de Gauss-Jordan, si bien es menos eficiente para sistemas grandes, resulta útil para el cálculo de la inversa de matrices y el análisis de dependencia lineal. Por su parte, la factorización LU es especialmente eficiente cuando se deben resolver múltiples sistemas con la misma matriz de coeficientes, siendo ampliamente utilizada en aplicaciones científicas y de ingeniería.
+
+En conclusión, la elección del método adecuado depende del contexto y de los objetivos específicos del problema a resolver. Un conocimiento profundo de las características de cada técnica permite seleccionar la más conveniente, optimizando así el proceso de resolución y asegurando resultados precisos y eficientes.
+
+% Referencias
+\section{Referencias}
+
+\begin{itemize}
+    \item Almeida, P. R., \& Franco, J. R. (1998). Eliminación gaussiana para sistemas de ecuaciones lineales. \textit{Revista Educación Matemática, 10}(1), 74--88.
+    \item Banachiewicz, T. (1938). Zur Berechnung der Determinanten und Inversion der Matrizen. \textit{Acta Astronomica, 6}(1), 7--21.
+    \item Crout, P. D. (1941). A short method for evaluating determinants and solving systems of linear equations with real or complex coefficients. \textit{Transactions of the American Institute of Electrical Engineers, 60}, 1235--1241.
+    \item Golub, G. H., \& Van Loan, C. F. (1996). \textit{Matrix computations} (3rd ed.). Johns Hopkins University Press.
+    \item Grcar, J. F. (2011). How ordinary elimination became Gaussian elimination. \textit{Historia Mathematica, 38}(2), 163--218. https://doi.org/10.1016/j.hm.2010.06.003
+    \item Heredia, A. E. P. (2021). Matriz inversa -- Método de Gauss-Jordan. CEFYM.
+    \item Higham, N. J. (2002). \textit{Accuracy and stability of numerical algorithms} (2nd ed.). SIAM.
+    \item Lay, D. C. (2012). \textit{Álgebra lineal y sus aplicaciones} (4ª ed.). Pearson.
+    \item Mehtre, V. V., \& Tiwari, S. (2022). Review on Gauss Jordan method and its applications. \textit{International Journal of Advances in Engineering and Management, 4}(2), 1--5.
+    \item Molina, M. I., et al. (2014). El arte de resolver sistemas de ecuaciones lineales: de Liu Hui a Gauss. \textit{Revista Latinoamericana de Etnomatemática, 7}(1), 6--23.
+    \item Strang, G. (2009). \textit{Introduction to linear algebra} (4th ed.). Wellesley--Cambridge Press.
+    \item Trefethen, L. N., \& Bau, D. (1997). \textit{Numerical linear algebra}. SIAM.
+    \item Turing, A. M. (1948). Rounding-off errors in matrix processes. \textit{Quarterly Journal of Mechanics and Applied Mathematics, 1}(1), 287--308.
+\end{itemize}
+
+\end{document}
+% Fin del documento
