@@ -1,191 +1,180 @@
 def suma_matriz(matriz_A, matriz_B):
 
-    # 1) Validar dimensiones
-    num_filas = len(matriz_A)
-    num_columnas = len(matriz_A[0])
-    if len(matriz_B) != num_filas or any(len(fila) != num_columnas for fila in matriz_B):
-        raise ValueError("Las matrices deben tener las mismas dimensiones m x n")
+    validar_mismas_dimensiones(matriz_A, matriz_B)
 
-    # 2) Inicializar matriz resultado con ceros
-    matriz_resultado = []
-    for fila in range(num_filas):
-        matriz_resultado.append([0] * num_columnas)
+    numero_filas   = len(matriz_A)
+    numero_columnas = len(matriz_A[0])
 
-    # 3) Sumar elemento a elemento
-    for fila in range(num_filas):
-        for columna in range(num_columnas):
-            valor_A = matriz_A[fila][columna]
-            valor_B = matriz_B[fila][columna]
-            valor_suma = valor_A + valor_B
-            matriz_resultado[fila][columna] = valor_suma
+    matriz_resultado = [[0]*numero_columnas for _ in range(numero_filas)]
+
+    for i in range(numero_filas):
+        for j in range(numero_columnas):
+            matriz_resultado[i][j] = matriz_A[i][j] + matriz_B[i][j]
 
     return matriz_resultado
 
 def resta_matriz(matriz_A, matriz_B):
 
-    # 1) Validar dimensiones
-    num_filas = len(matriz_A)
-    num_columnas = len(matriz_A[0])
-    if len(matriz_B) != num_filas or any(len(fila) != num_columnas for fila in matriz_B):
-        raise ValueError("Las matrices deben tener las mismas dimensiones m x n")
+    validar_mismas_dimensiones(matriz_A, matriz_B)
 
-    # 2) Inicializar matriz resultado con ceros
-    matriz_resultado = []
-    for fila in range(num_filas):
-        matriz_resultado.append([0] * num_columnas)
+    numero_filas   = len(matriz_A)
+    numero_columnas = len(matriz_A[0])
 
-    # 3) Restar elemento a elemento
-    for fila in range(num_filas):
-        for columna in range(num_columnas):
-            valor_A = matriz_A[fila][columna]
-            valor_B = matriz_B[fila][columna]
-            valor_resta = valor_A - valor_B
-            matriz_resultado[fila][columna] = valor_resta
+    matriz_resultado = [[0]*numero_columnas for _ in range(numero_filas)]
+
+    for i in range(numero_filas):
+        for j in range(numero_columnas):
+            matriz_resultado[i][j] = matriz_A[i][j] - matriz_B[i][j]
 
     return matriz_resultado
 
 def producto_matrices(matriz_A, matriz_B):
 
-    # 1) Obtener dimensiones
-    filas_A = len(matriz_A)
+    validar_producto(matriz_A, matriz_B)
+    filas_A    = len(matriz_A)
     columnas_A = len(matriz_A[0])
-    if any(len(fila) != columnas_A for fila in matriz_A):
-        raise ValueError("La matriz A no es rectangular")
-    if len(matriz_B) == 0 or any(len(fila) != len(matriz_B[0]) for fila in matriz_B):
-        raise ValueError("La matriz B no es rectangular")
-    filas_B = len(matriz_B)
     columnas_B = len(matriz_B[0])
-    if filas_B != columnas_A:
-        raise ValueError("El número de columnas de A debe coincidir con el número de filas de B")
 
-    # 2) Inicializar matriz resultado con ceros
-    matriz_resultado = []
-    for fila in range(filas_A):
-        matriz_resultado.append([0] * columnas_B)
+    matriz_resultado = [[0]*columnas_B for _ in range(filas_A)]
 
-    # 3) Producto punto elemento a elemento
-    for fila in range(filas_A):
-        for columna in range(columnas_B):
-            suma_acumulada = 0
-            for indice_multiplicador in range(columnas_A):
-                valor_A = matriz_A[fila][indice_multiplicador]
-                valor_B = matriz_B[indice_multiplicador][columna]
-                producto = valor_A * valor_B
-                suma_acumulada += producto
-            matriz_resultado[fila][columna] = suma_acumulada
+    for i in range(filas_A):
+        for j in range(columnas_B):
+            suma = 0
+            for k in range(columnas_A):
+                suma += matriz_A[i][k] * matriz_B[k][j]
+            matriz_resultado[i][j] = suma
 
     return matriz_resultado
 
-def inversa_matriz(matriz_A):
-
-    # 1) Validar que A sea cuadrada
-    n = len(matriz_A)
-    if any(len(fila) != n for fila in matriz_A):
-        raise ValueError("La matriz debe ser cuadrada (n×n).")
-    
-    # 2) Crear matriz aumentada [A | I]
-    # Copiar fila a fila para no modificar matriz_A original
-    matriz_aumentada = []
-    for i in range(n):
-        fila_A = list(matriz_A[i])               # copia de A
-        fila_I = [1.0 if i == j else 0.0 for j in range(n)]
-        matriz_aumentada.append(fila_A + fila_I)
-    
-    # 3) Eliminación Gauss–Jordan
-    for pivote_indice in range(n):
-        # 3.1) Encontrar pivote y, si es cero, intercambiar con fila inferior
-        pivote = matriz_aumentada[pivote_indice][pivote_indice]
-        if abs(pivote) < 1e-12:
-            # buscar fila k>i con elemento no cero en la misma columna
-            fila_intercambio = None
-            for k in range(pivote_indice+1, n):
-                if abs(matriz_aumentada[k][pivote_indice]) > 1e-12:
-                    fila_intercambio = k
-                    break
-            if fila_intercambio is None:
-                raise ValueError("La matriz es singular y no tiene inversa.")
-            # intercambiar filas
-            matriz_aumentada[pivote_indice], matriz_aumentada[fila_intercambio] = \
-                matriz_aumentada[fila_intercambio], matriz_aumentada[pivote_indice]
-            pivote = matriz_aumentada[pivote_indice][pivote_indice]
-        
-        # 3.2) Normalizar la fila del pivote (hacer 1 en diagonal)
-        for col in range(2*n):
-            matriz_aumentada[pivote_indice][col] /= pivote
-        
-        # 3.3) Eliminar todos los demás elementos de la columna del pivote
-        for fila in range(n):
-            if fila == pivote_indice:
-                continue
-            factor = matriz_aumentada[fila][pivote_indice]
-            # restar factor * fila_pivote a la fila actual
-            for col in range(2*n):
-                matriz_aumentada[fila][col] -= factor * matriz_aumentada[pivote_indice][col]
-    
-    # 4) Extraer la parte derecha de la matriz aumentada → inversa
-    matriz_inversa = []
-    for i in range(n):
-        # columnas n a 2n-1
-        fila_inv = matriz_aumentada[i][n:2*n]
-        matriz_inversa.append(fila_inv)
-    
-    return matriz_inversa
-
 def determinante_matriz(matriz_A):
+ 
+    validar_cuadrada(matriz_A)
+    tamaño = len(matriz_A)
 
-    # 1) Validar que A sea cuadrada
-    n = len(matriz_A)
-    if n == 0 or any(len(fila) != n for fila in matriz_A):
-        raise ValueError("La matriz debe ser cuadrada (n×n).")
+    matriz_copia = [fila[:] for fila in matriz_A]
+    signo = 1
 
-    # 2) Copiar A para no modificar la original
-    A = [list(fila) for fila in matriz_A]
-    signo = 1      # registro de intercambios de filas
+    for columna in range(tamaño):
+        fila_pivote = max(range(columna, tamaño), key=lambda fila: abs(matriz_copia[fila][columna]))
 
-    # 3) Eliminación hacia adelante con pivotaje parcial
-    for i in range(n):
-        # 3.1) Buscar fila de pivote (valor máximo absoluto en columna i)
-        fila_pivote = max(range(i, n), key=lambda k: abs(A[k][i]))
-        if abs(A[fila_pivote][i]) < 1e-12:
-            return 0.0  # columna de ceros => determinante cero
+        if abs(matriz_copia[fila_pivote][columna]) < 1e-12: # 1e- 12 es aproximado a cero para evitar errores de redondeo
+            return 0.0
 
-        # 3.2) Si la fila de pivote no es i, intercambiar y cambiar signo
-        if fila_pivote != i:
-            A[i], A[fila_pivote] = A[fila_pivote], A[i]
+        if fila_pivote != columna:
+            matriz_copia[columna], matriz_copia[fila_pivote] = (matriz_copia[fila_pivote], matriz_copia[columna])
             signo *= -1
 
-        # 3.3) Anular abajo del pivote
-        for fila in range(i+1, n):
-            factor = A[fila][i] / A[i][i]
-            # restar factor * fila_pivote a la fila actual
-            for col in range(i, n):
-                A[fila][col] -= factor * A[i][col]
+        for fila in range(columna + 1, tamaño):
+            factor = (matriz_copia[fila][columna]/ matriz_copia[columna][columna])
+            for columna in range(columna, tamaño):
+                matriz_copia[fila][columna] -= (factor * matriz_copia[columna][columna])
 
-    # 4) Determinante = signo * producto de diagonales
-    det = signo
-    for i in range(n):
-        det *= A[i][i]
-    return det
+    determinante = signo
+    for i in range(tamaño):
+        determinante *= matriz_copia[i][i]
 
-def factorizacion_LU(A):
+    return determinante
 
+
+def inversa_matriz(matriz_A):
+
+    validar_cuadrada(matriz_A)
+    tamaño = len(matriz_A)
+
+    matriz_aumentada = [matriz_A[fila][:] + [1.0 if fila == columna else 0.0 for columna in range(tamaño)] for fila in range(tamaño)]
+
+    for indice_pivote in range(tamaño):
+        fila_pivote = max(range(indice_pivote, tamaño), key=lambda fila: abs(matriz_aumentada[fila][indice_pivote]))
+
+        if abs(matriz_aumentada[fila_pivote][indice_pivote]) < 1e-12:
+            raise ValueError("Matriz singular, no tiene inversa.")
+        
+        matriz_aumentada[indice_pivote], matriz_aumentada[fila_pivote] = (matriz_aumentada[fila_pivote], matriz_aumentada[indice_pivote])
+
+        pivote = matriz_aumentada[indice_pivote][indice_pivote]
+        for columna in range(2 * tamaño):
+            matriz_aumentada[indice_pivote][columna] /= pivote
+
+        for fila in range(tamaño):
+            if fila == indice_pivote:
+                continue
+            factor = matriz_aumentada[fila][indice_pivote]
+            for columna in range(2 * tamaño):
+                matriz_aumentada[fila][columna] -= (factor * matriz_aumentada[indice_pivote][columna])
+
+    matriz_inversa = [matriz_aumentada[fila][tamaño:2*tamaño] for fila in range(tamaño)]
+
+    return matriz_inversa
+
+def factorizacion_LU(matriz_A):
+
+    validar_cuadrada(matriz_A)
+    tamaño = len(matriz_A)
+
+    matriz_L = [[0.0] * tamaño for _ in range(tamaño)]
+    matriz_U = [fila[:] for fila in matriz_A]
+
+    for indice in range(tamaño):
+        matriz_L[indice][indice] = 1.0
+
+    for columna in range(tamaño):
+        pivote = matriz_U[columna][columna]
+
+        if abs(pivote) < 1e-12:
+            raise ValueError(f"Pivote cero o muy pequeño en columna {columna}")
+        
+        for fila in range(columna + 1, tamaño):
+            multiplicador = (matriz_U[fila][columna] / pivote)
+            matriz_L[fila][columna] = multiplicador
+
+            for indice_k in range(columna, tamaño):
+                matriz_U[fila][indice_k] -= (multiplicador * matriz_U[columna][indice_k])
+
+    return matriz_L, matriz_U
+
+
+def resolver_sistema_gauss(matriz_coeficientes, vector_terminos):
+
+    validar_cuadrada(matriz_coeficientes)
+    numero_ecuaciones = len(matriz_coeficientes)
+    if len(vector_terminos) != numero_ecuaciones:
+        raise ValueError("El vector de términos independientes debe tener longitud n")
+
+    matriz_aumentada = [matriz_coeficientes[fila][:] + [vector_terminos[fila]] for fila in range(numero_ecuaciones)]
+
+    for columna in range(numero_ecuaciones):
+        fila_pivote = max(range(columna, numero_ecuaciones), key=lambda f: abs(matriz_aumentada[f][columna]))
+
+        if abs(matriz_aumentada[fila_pivote][columna]) < 1e-12:
+            raise ValueError("El sistema es singular o mal condicionado")
+        matriz_aumentada[columna], matriz_aumentada[fila_pivote] = (matriz_aumentada[fila_pivote], matriz_aumentada[columna]
+                                                                           )
+        for fila in range(columna + 1, numero_ecuaciones):
+            coef_multiplicador = (matriz_aumentada[fila][columna]/ matriz_aumentada[columna][columna])
+            for columna_aumentada in range(columna, numero_ecuaciones + 1):
+                matriz_aumentada[fila][columna_aumentada] -= (coef_multiplicador * matriz_aumentada[columna][columna_aumentada])
+
+    solucion = [0.0] * numero_ecuaciones
+    for fila in range(numero_ecuaciones - 1, -1, -1):
+        suma_conocidos = sum(matriz_aumentada[fila][col] * solucion[col] for col in range(fila + 1, numero_ecuaciones))
+        solucion[fila] = (matriz_aumentada[fila][numero_ecuaciones] - suma_conocidos) / matriz_aumentada[fila][fila]
+
+    return solucion
+
+# validaciones
+
+def validar_mismas_dimensiones(A, B):
+    if len(A) != len(B) or any(len(A[i]) != len(B[i]) for i in range(len(A))):
+        raise ValueError("Las matrices deben tener las mismas dimensiones m×n.")
+
+def validar_cuadrada(A):
     n = len(A)
-    L = [[0.0]*n for _ in range(n)]
-    U = [row[:] for row in A]
-    for i in range(n):
-        L[i][i] = 1.0
+    if any(len(fil) != n for fil in A):
+        raise ValueError("La matriz debe ser cuadrada (n×n).")
 
-    # Recorrer columnas
-    for j in range(n):
-        # Para cada fila i > j, calcular el multiplicador y eliminar
-        pivot = U[j][j]
-        if pivot is None or pivot == 0:
-            raise ValueError(f"Pivote nulo en columna {j}, requiere pivotaje.")
-        for i in range(j+1, n):
-            m = U[i][j] / pivot    # multiplicador
-            L[i][j] = m
-            # Restar m * fila j de la fila i en U
-            for k in range(j, n):
-                U[i][k] -= m * U[j][k]
+def validar_producto(A, B):
 
-    return L, U
+    filas_A, cols_A = len(A), len(A[0])
+    filas_B, cols_B = len(B), len(B[0])
+    if cols_A != filas_B:
+        raise ValueError("Columnas de A deben coincidir con filas de B para multiplicar.")
