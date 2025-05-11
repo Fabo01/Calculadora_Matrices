@@ -130,6 +130,8 @@ def on_click(sender, app_data):
         # Difusión de error en la ventana correspondiente
         if sender in ("btn_sum","btn_sub","btn_mul"):
             dpg.set_value("out_bin", f"Error: {e}")
+        elif sender in ("btn_solve"):
+            dpg.set_value("out_sys", f"Error: {e}")
         else:
             dpg.set_value("out_uni", f"Error: {e}")
             dpg.set_value("out_L","")
