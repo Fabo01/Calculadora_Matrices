@@ -30,7 +30,6 @@ def producto_matrices(matriz_A, matriz_B):
     filas_A    = len(matriz_A)
     columnas_A = len(matriz_A[0])
     columnas_B = len(matriz_B[0])
-
     matriz_resultado = [[0]*columnas_B for _ in range(filas_A)]
 
     for i in range(filas_A):
@@ -39,6 +38,8 @@ def producto_matrices(matriz_A, matriz_B):
             for k in range(columnas_A):
                 suma += matriz_A[i][k] * matriz_B[k][j]
             matriz_resultado[i][j] = suma
+
+    matriz_resultado = limpiar_matriz(matriz_resultado)
 
     return matriz_resultado
 

@@ -9,11 +9,9 @@ from funciones import (
     resolver_sistema_gauss
 )
 
-# 1) Contexto y viewport
 dpg.create_context()
 dpg.create_viewport(title="Calculadora Matricial", width=720, height=790)
 
-# 2) Tema oscuro
 with dpg.theme() as global_theme:
     with dpg.theme_component(dpg.mvAll):
         dpg.add_theme_color(dpg.mvThemeCol_WindowBg,  (30,30,30))
@@ -23,7 +21,6 @@ with dpg.theme() as global_theme:
         dpg.add_theme_color(dpg.mvThemeCol_Text,      (200,200,200))
 dpg.bind_theme(global_theme)
 
-# 3) Ventana binaria: A <op> B
 with dpg.window(label="Operaciones entre matrices",
                 pos=(10,10), width=330, height=350):
     dpg.add_text("Matriz A (filas separadas por ',')", color=(200,200,200))
@@ -39,7 +36,6 @@ with dpg.window(label="Operaciones entre matrices",
     dpg.add_text("Resultado:", color=(200,200,200))
     dpg.add_input_text(tag="out_bin", multiline=True, readonly=True, height=150)
 
-# 4) Ventana unaria: operaciones sobre A
 with dpg.window(label="Operaciones sobre una matriz",
                 pos=(360,10), width=330, height=500):
     dpg.add_text("Matriz A (filas separadas por ',')", color=(200,200,200))
@@ -57,7 +53,6 @@ with dpg.window(label="Operaciones sobre una matriz",
     dpg.add_text("Factor U:", color=(200,200,200))
     dpg.add_input_text(tag="out_U", multiline=True, readonly=True, height=100)
 
-# — Ventana 3: Resolver sistemas A·x = b —
 with dpg.window(label="Resolución de Sistemas Lineales",
                 pos=(10, 380), width=330, height=300):
     dpg.add_text("Matriz A (filas separadas por ',')", color=(200,200,200))
@@ -70,11 +65,8 @@ with dpg.window(label="Resolución de Sistemas Lineales",
     dpg.add_text("Solución x:", color=(200,200,200))
     dpg.add_input_text(tag="out_sys", multiline=True, readonly=True, height=100)
 
-
-# 5) Callback unificado
 def on_click(sender, app_data):
     try:
-        # — operaciones binarias —
         if sender in ("btn_sum","btn_sub","btn_mul"):
             texto_A = dpg.get_value("bin_A").strip()
             texto_B = dpg.get_value("bin_B").strip()
@@ -86,11 +78,9 @@ def on_click(sender, app_data):
                 R = resta_matriz(A, B)
             else:
                 R = producto_matrices(A, B)
-            # volcamos en ventana binaria
             dpg.set_value("out_bin", "\n".join(str(fila) for fila in R))
             return
 
-        # — operaciones unarias —
         if sender in ("btn_det","btn_inv","btn_LU"):
             texto_A = dpg.get_value("uni_A").strip()
             A = [[float(x) for x in fila.split()] for fila in texto_A.split(",")]
@@ -105,29 +95,22 @@ def on_click(sender, app_data):
                 dpg.set_value("out_uni", "\n".join(str(fila) for fila in invA))
                 dpg.set_value("out_L","")
                 dpg.set_value("out_U","")
-            else:  # fac LU
+            else:
                 L, U = factorizacion_LU(A)
                 dpg.set_value("out_uni", "Ver factores L y U")
                 dpg.set_value("out_L", "\n".join(" ".join(f"{v:.4g}" for v in fila) for fila in L))
                 dpg.set_value("out_U", "\n".join(" ".join(f"{v:.4g}" for v in fila) for fila in U))
             return
         
-                # — Resolver sistema por Gauss —
         if sender == "btn_solve":
-            # parsear A
             texto_A = dpg.get_value("sys_A").strip()
             A = [[float(x) for x in fila.split()] for fila in texto_A.split(",")]
-            # parsear b
             b = [float(x) for x in dpg.get_value("sys_b").split()]
-            # resolver
             x = resolver_sistema_gauss(A, b)
-            # mostrar
             dpg.set_value("out_sys", "  ".join(f"{xi:.6g}" for xi in x))
             return
 
-
     except Exception as e:
-        # Difusión de error en la ventana correspondiente
         if sender in ("btn_sum","btn_sub","btn_mul"):
             dpg.set_value("out_bin", f"Error: {e}")
         elif sender in ("btn_solve"):
@@ -137,11 +120,9 @@ def on_click(sender, app_data):
             dpg.set_value("out_L","")
             dpg.set_value("out_U","")
 
-# 6) Asignar callbacks
 for tag in ("btn_sum","btn_sub","btn_mul","btn_det","btn_inv","btn_LU","btn_solve"):
     dpg.set_item_callback(tag, on_click)
 
-# 7) Ejecutar GUI
 dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.start_dearpygui()
